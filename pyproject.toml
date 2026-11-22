@@ -1,0 +1,44 @@
+[project]
+name = "bench-lance"
+version = "0.1.0"
+description = "Benchmarks for the Lance format and LanceDB"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "lancedb>=0.41",
+  "pylance>=14.0.2",
+  "numpy>=2",
+  "pyarrow>=18",
+  "pdoc>=16.0.0,<17",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.dependencies]
+python = "3.12.*"
+pytest = ">=8"
+ruff = ">=0.8"
+
+[tool.pixi.tasks]
+bench = { cmd = "python -m bench_lance all", env = { PYTHONPATH = "src" } }
+format = { cmd = "python -m bench_lance format", env = { PYTHONPATH = "src" } }
+vector = { cmd = "python -m bench_lance vector", env = { PYTHONPATH = "src" } }
+convert = { cmd = "python -m bench_lance convert", env = { PYTHONPATH = "src" } }
+test = "pytest -q"
+lint = "ruff check"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+# W503 and W504 are in the style's flake8 ignore list. Ruff 0.17 removed
+# those rules, so listing them here is an error.
+ignore = ["E211", "E225", "E226", "E227", "E402"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "--doctest-modules --ignore=src/bench_lance/__main__.py"
+testpaths = ["src/bench_lance", "tests"]
